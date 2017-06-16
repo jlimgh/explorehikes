@@ -1,0 +1,13 @@
+<% include partials/header %>
+
+<h1>This is the hiking spots page!</h1>
+
+<% hikes.forEach(function(hike) { %>
+    <div>
+        <h4><%= hike.name %></h4>
+        <img src="<%= hike.image %>"
+    </div>    
+    
+<% }); %>
+
+<% include partials/footer %>
