@@ -1,13 +1,30 @@
 <% include partials/header %>
 
-<h1>This is the hiking spots page!</h1>
 
-<% hikes.forEach(function(hike) { %>
-    <div>
-        <h4><%= hike.name %></h4>
-        <img src="<%= hike.image %>"
-    </div>    
+<div class = "container">
+    <header class="jumbotron">
+        <div class="container">
+            <h1>This is the hiking spots page!</h1>
+            <p>View our handpicked hiking spots</p>
+            <p>
+                <a class="btn btn-primary btn-lrg" href="/hikingspots/new">Create a new hike</a>
+            </p>
+        </div>
+    </header>
     
-<% }); %>
+    <div class="row" style="display: flex; flex-wrap: wrap;">
+        <% hikes.forEach(function(hike) { %>
+            <div class="col-md-3 col-md-6">
+                <div class="thumbnail">
+                    </h4><img src="<%= hike.image %>">
+                    <div class="caption">
+                        <h4><%= hike.name %></h4>
+                    </div>
+                </div>
+            </div>    
+            
+        <% }); %>
+    </div>
+</div>
 
 <% include partials/footer %>
