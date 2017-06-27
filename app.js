@@ -2,18 +2,11 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
+var Hikes = require("./models/hikes");
 
 mongoose.connect("mongodb://localhost/explore_hikes");
 
-//schema
-var hikesSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-})
 
-//model
-var Hikes = mongoose.model("Hikes", hikesSchema);
 
 // Hikes.create(
 //     {
