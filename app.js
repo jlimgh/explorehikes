@@ -3,37 +3,17 @@ var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var Hikes = require("./models/hikes");
+var Comments = require("./models/comment");
+var seedDB = require("./seeds");
 
+seedDB();
 mongoose.connect("mongodb://localhost/explore_hikes");
 
 
 
-// Hikes.create(
-//     {
-//         name: "Mountain", 
-//         image: "https://farm4.staticflickr.com/3866/18659273934_9dd488d112.jpg",
-//         description: "This mountain is great. Tester run"
-//     }, function(err, hike) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             console.log("newly created hike!");
-//             console.log(hike);
-//         }
-// })
-
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-// var hikes = [
-//     {name: "Mountain", image: "https://farm4.staticflickr.com/3866/18659273934_9dd488d112.jpg"},
-//     {name: "Granite Hill", image: "https://farm1.staticflickr.com/453/19094215060_de6549b159.jpg"},
-//     {name: "Goat Rest", image: "https://farm3.staticflickr.com/2886/34400868465_f4d39d6361.jpg"},
-//     {name: "Mountain", image: "https://farm4.staticflickr.com/3866/18659273934_9dd488d112.jpg"},
-//     {name: "Granite Hill", image: "https://farm1.staticflickr.com/453/19094215060_de6549b159.jpg"},
-//     {name: "Goat Rest", image: "https://farm3.staticflickr.com/2886/34400868465_f4d39d6361.jpg"}    
-// ];
 
 app.get("/", function(req, res) {
     res.render("landing");
@@ -45,12 +25,12 @@ app.get("/hikingspots", function(req, res) {
         if (err) {
             console.log(err);
         } else {
-            res.render("index", {hikes: allHikes});
+            res.render("hikes/index", {hikes: allHikes});
         }
     })
 });
 
-
+//create - add new hike to db
 app.post("/hikingspots", function(req, res) {
     var name = req.body.name;
     var image = req.body.image;
@@ -69,20 +49,58 @@ app.post("/hikingspots", function(req, res) {
 
 });
 
+//new - show form to create new hike
 app.get("/hikingspots/new", function(req, res) {
-    res.render("new.ejs");
+    res.render("hikes/new");
 })
 
+//show - show info about one hike
 app.get("/hikingspots/:id", function(req, res) {
     //find hike w/ provided id
     //render show template w/ that hike
-    Hikes.findById(req.params.id, function(err, foundHike) {
+    Hikes.findById(req.params.id).populate("comments").exec(function(err, foundHike) {
         if (err) {
             console.log(err)
         } else {
-            res.render("show", {hike: foundHike});
+            console.log(foundHike);
+            res.render("hikes/show", {hike: foundHike});
         }
     });
+})
+
+
+//***COMMENTS Routes
+app.get("/hikingspots/:id/comments/new", function(req, res) {
+    Hikes.findById(req.params.id, function(err, hike) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("comments/new", {hike: hike});
+        }
+    });
+})
+
+app.post("/hikingspots/:id/comments", function(req, res) {
+    //find hike by id
+    Hikes.findById(req.params.id, function(err, hike) {
+        if (err) {
+            console.log(err);
+            res.redirect("/hikingspots");
+        } else {
+            Comments.create(req.body.comment, function(err, comment) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    hike.comments.push(comment);
+                    hike.save();
+                    res.redirect("/hikingspots/" + hike._id);
+                }
+            })
+        }
+    })
+    //create comment in db
+    //connect new comment to hike
+    //redirect back to show page
 })
 
 app.listen(process.env.PORT, process.env.IP, function() {
