@@ -56,6 +56,30 @@ router.get("/:id", function(req, res) {
     });
 });
 
+//Edit
+router.get("/:id/edit", function(req, res) {
+    Hikes.findById(req.params.id, function(err, foundHike) {
+        if (err) {
+            res.redirect("/hikingspots");
+        } else {
+            res.render("hikes/edit", {hike: foundHike});
+        }
+    });
+    
+});
+
+//Update
+router.put("/:id", function(req, res) {
+    //find and update correct hiking spot
+    Hikes.findByIdAndUpdate(req.params.id, req.body.hike, function(err, updatedHike) {
+        if (err) {
+            res.redirect("/hikingspots");
+        } else {
+            res.redirect("/hikingspots/" + req.params.id);
+        }
+    });
+});
+
 //middleware
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
