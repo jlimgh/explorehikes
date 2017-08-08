@@ -28,35 +28,35 @@ var data = [
 function seedDB() {
     //remove hikes
     Hikes.remove({}, function(err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("removed campgrounds!");
-             //add hikes
-            data.forEach(function(seed) {
-                Hikes.create(seed, function(err, hike) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("we created a new hike");
-                        Comments.create(
-                            {
-                                text: "this is a test text comment. work!",
-                                author: "Juvy"
-                            }, function(err, comment) {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    hike.comments.push(comment);
-                                    hike.save();
-                                    console.log("created a new comment");
-                                }
-                            }
-                        )
-                    }
-                })
-            })
-        }
+        // if (err) {
+        //     console.log(err);
+        // } else {
+        //     console.log("removed campgrounds!");
+        //      //add hikes
+        //     data.forEach(function(seed) {
+        //         Hikes.create(seed, function(err, hike) {
+        //             if (err) {
+        //                 console.log(err);
+        //             } else {
+        //                 console.log("we created a new hike");
+        //                 Comments.create(
+        //                     {
+        //                         text: "this is a test text comment. work!",
+        //                         author: "Juvy"
+        //                     }, function(err, comment) {
+        //                         if (err) {
+        //                             console.log(err);
+        //                         } else {
+        //                             hike.comments.push(comment);
+        //                             hike.save();
+        //                             console.log("created a new comment");
+        //                         }
+        //                     }
+        //                 )
+        //             }
+        //         })
+        //     })
+        // }
     });
     
     //add comments
