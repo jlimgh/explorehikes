@@ -57,15 +57,10 @@ router.get("/:id", function(req, res) {
 });
 
 //Edit
-router.get("/:id/edit", function(req, res) {
-    Hikes.findById(req.params.id, function(err, foundHike) {
-        if (err) {
-            res.redirect("/hikingspots");
-        } else {
+router.get("/:id/edit", checkHikingspotOwnership, function(req, res) {
+        Hikes.findById(req.params.id, function(err, foundHike) {
             res.render("hikes/edit", {hike: foundHike});
-        }
-    });
-    
+        });
 });
 
 //Update
@@ -80,6 +75,17 @@ router.put("/:id", function(req, res) {
     });
 });
 
+//Destroy
+router.delete("/:id", function(req, res) {
+    Hikes.findByIdAndRemove(req.params.id, function(err) {
+        if (err) {
+            res.redirect("/hikingspots");
+        } else {
+            res.redirect("/hikingspots");
+        }
+    })
+});
+
 //middleware
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
@@ -88,5 +94,24 @@ function isLoggedIn(req, res, next) {
     res.redirect("/login");
 }
 
+function checkHikingspotOwnership(req, res, next) {
+    if (req.isAuthenticated()) {
+        Hikes.findById(req.params.id, function(err, foundHike) {
+            if (err) {
+                res.redirect("back");
+            } else {
+                //if so, did user create the hikingspot
+                if (foundHike.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+            }
+        });
+    } else {
+        //takes user back to previous page they were on
+        res.redirect("back");
+    }
+}
 
 module.exports = router;
