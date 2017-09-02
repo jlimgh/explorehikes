@@ -64,7 +64,7 @@ router.get("/:id/edit", checkHikingspotOwnership, function(req, res) {
 });
 
 //Update
-router.put("/:id", function(req, res) {
+router.put("/:id", checkHikingspotOwnership, function(req, res) {
     //find and update correct hiking spot
     Hikes.findByIdAndUpdate(req.params.id, req.body.hike, function(err, updatedHike) {
         if (err) {
@@ -76,7 +76,7 @@ router.put("/:id", function(req, res) {
 });
 
 //Destroy
-router.delete("/:id", function(req, res) {
+router.delete("/:id", checkHikingspotOwnership, function(req, res) {
     Hikes.findByIdAndRemove(req.params.id, function(err) {
         if (err) {
             res.redirect("/hikingspots");
@@ -101,6 +101,7 @@ function checkHikingspotOwnership(req, res, next) {
                 res.redirect("back");
             } else {
                 //if so, did user create the hikingspot
+                //foundHike.author.id (mongoose object) === req.user._id (string) is false. Even though console logging it appears to be a string
                 if (foundHike.author.id.equals(req.user._id)) {
                     next();
                 } else {

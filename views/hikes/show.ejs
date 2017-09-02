@@ -19,10 +19,12 @@
                     <p>
                         <em>Submitted by <%= hike.author.username %></em>
                     </p>
+                    <% if(currentUser && hike.author.id.equals(currentUser._id)) { %>
                     <a class="btn btn-warning" href="/hikingspots/<%= hike._id %>/edit">Edit</a>
                     <form id="delete-form" action="/hikingspots/<%= hike._id %>?_method=DELETE" method="POST">
                         <button class="btn btn-danger">Delete</button>
                     </form>
+                    <% } %>
                 </div>
             </div>
             <div class="well">
