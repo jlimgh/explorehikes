@@ -41,6 +41,29 @@ router.post("/", isLoggedIn, function(req, res) {
     });
 });
 
+//Comments Edit Route
+router.get("/:comment_id/edit", function(req, res) {
+    Comments.findById(req.params.comment_id, function(err, foundComment) {
+        if (err) {
+            res.redirect("back");
+        } else {
+            res.render("comments/edit", {hike_id: req.params.id, comment: foundComment});
+        }
+    });
+});
+
+//Comments Upddate Route
+router.put("/:comment_id", function(req, res) {
+    Comments.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment) {
+        if (err) {
+            res.redirect("back");
+        } else {
+            res.redirect("/hikingspots/" + req.params.id);
+        }
+    });
+});
+
+
 //middleware
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
