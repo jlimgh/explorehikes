@@ -42,7 +42,7 @@ router.post("/", isLoggedIn, function(req, res) {
 });
 
 //Comments Edit Route
-router.get("/:comment_id/edit", function(req, res) {
+router.get("/:comment_id/edit", checkCommentOwnership, function(req, res) {
     Comments.findById(req.params.comment_id, function(err, foundComment) {
         if (err) {
             res.redirect("back");
@@ -53,7 +53,7 @@ router.get("/:comment_id/edit", function(req, res) {
 });
 
 //Comments Update Route
-router.put("/:comment_id", function(req, res) {
+router.put("/:comment_id", checkCommentOwnership, function(req, res) {
     Comments.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment) {
         if (err) {
             res.redirect("back");
@@ -64,7 +64,7 @@ router.put("/:comment_id", function(req, res) {
 });
 
 //Comments Destroy Route
-router.delete("/:comment_id", function(req, res) {
+router.delete("/:comment_id", checkCommentOwnership, function(req, res) {
     //findById and remove
     Comments.findByIdAndRemove(req.params.comment_id, function(err) {
         if (err) {
@@ -82,6 +82,28 @@ function isLoggedIn(req, res, next) {
         return next();
     }
     res.redirect("/login");
+}
+
+
+function checkCommentOwnership(req, res, next) {
+    if (req.isAuthenticated()) {
+        Comments.findById(req.params.comment_id, function(err, foundComment) {
+            if (err) {
+                res.redirect("back");
+            } else {
+                //if so, did user create the comment?
+                //foundHike.author.id (mongoose object) === req.user._id (string) is false. Even though console logging it appears to be a string
+                if (foundComment.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+            }
+        });
+    } else {
+        //takes user back to previous page they were on
+        res.redirect("back");
+    }
 }
 
 module.exports = router;
