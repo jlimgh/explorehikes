@@ -52,7 +52,7 @@ router.get("/:comment_id/edit", function(req, res) {
     });
 });
 
-//Comments Upddate Route
+//Comments Update Route
 router.put("/:comment_id", function(req, res) {
     Comments.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment) {
         if (err) {
@@ -61,6 +61,18 @@ router.put("/:comment_id", function(req, res) {
             res.redirect("/hikingspots/" + req.params.id);
         }
     });
+});
+
+//Comments Destroy Route
+router.delete("/:comment_id", function(req, res) {
+    //findById and remove
+    Comments.findByIdAndRemove(req.params.comment_id, function(err) {
+        if (err) {
+            res.redirect("back");
+        } else {
+            res.redirect("/hikingspots/" + req.params.id);
+        }
+    })
 });
 
 
