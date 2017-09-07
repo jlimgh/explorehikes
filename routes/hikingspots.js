@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Hikes = require("../models/hikes");
+var middleware = require("../middleware");
 
 //Index page- shows all hikes
 router.get("/", function(req, res) {
@@ -15,7 +16,7 @@ router.get("/", function(req, res) {
 });
 
 //Create - add new hike to db
-router.post("/", isLoggedIn, function(req, res) {
+router.post("/", middleware.isLoggedIn, function(req, res) {
     var name = req.body.name;
     var image = req.body.image;
     var desc = req.body.description;
@@ -38,7 +39,7 @@ router.post("/", isLoggedIn, function(req, res) {
 });
 
 //New - show form to create new hike
-router.get("/new", isLoggedIn, function(req, res) {
+router.get("/new", middleware.isLoggedIn, function(req, res) {
     res.render("hikes/new");
 });
 
@@ -57,14 +58,14 @@ router.get("/:id", function(req, res) {
 });
 
 //Edit
-router.get("/:id/edit", checkHikingspotOwnership, function(req, res) {
+router.get("/:id/edit", middleware.checkHikingspotOwnership, function(req, res) {
         Hikes.findById(req.params.id, function(err, foundHike) {
             res.render("hikes/edit", {hike: foundHike});
         });
 });
 
 //Update
-router.put("/:id", checkHikingspotOwnership, function(req, res) {
+router.put("/:id", middleware.checkHikingspotOwnership, function(req, res) {
     //find and update correct hiking spot
     Hikes.findByIdAndUpdate(req.params.id, req.body.hike, function(err, updatedHike) {
         if (err) {
@@ -76,7 +77,7 @@ router.put("/:id", checkHikingspotOwnership, function(req, res) {
 });
 
 //Destroy
-router.delete("/:id", checkHikingspotOwnership, function(req, res) {
+router.delete("/:id", middleware.checkHikingspotOwnership, function(req, res) {
     Hikes.findByIdAndRemove(req.params.id, function(err) {
         if (err) {
             res.redirect("/hikingspots");
@@ -86,33 +87,5 @@ router.delete("/:id", checkHikingspotOwnership, function(req, res) {
     })
 });
 
-//middleware
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-}
-
-function checkHikingspotOwnership(req, res, next) {
-    if (req.isAuthenticated()) {
-        Hikes.findById(req.params.id, function(err, foundHike) {
-            if (err) {
-                res.redirect("back");
-            } else {
-                //if so, did user create the hikingspot
-                //foundHike.author.id (mongoose object) === req.user._id (string) is false. Even though console logging it appears to be a string
-                if (foundHike.author.id.equals(req.user._id)) {
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-            }
-        });
-    } else {
-        //takes user back to previous page they were on
-        res.redirect("back");
-    }
-}
 
 module.exports = router;
